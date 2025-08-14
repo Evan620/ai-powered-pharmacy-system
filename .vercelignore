@@ -1,0 +1,57 @@
+# Dependencies
+node_modules
+
+# Development files
+.env.local
+.env.development.local
+.env.test.local
+
+# Build outputs (will be rebuilt)
+apps/web/.next
+apps/web/out
+apps/web/dist
+
+# Cache directories
+apps/web/.next/cache
+.npm
+.yarn
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Documentation (optional - remove if you want docs deployed)
+docs/
+*.md
+
+# Scripts (optional - remove if needed for deployment)
+scripts/
+
+# Supabase local files
+.branches
+.temp
+.import
+
+# Test files
+**/*.test.js
+**/*.test.ts
+**/*.spec.js
+**/*.spec.ts
+__tests__/
+coverage/
