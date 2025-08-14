@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { transformSupabaseRelationships } from '@/lib/supabase-transforms';
 import { useState } from 'react';
+import { exportToCSV } from '@/lib/csv';
 import Link from 'next/link';
 
 export default function InventoryReportPage() {
@@ -246,7 +247,20 @@ export default function InventoryReportPage() {
               <h1 className="text-2xl font-semibold text-gray-900 mt-1">Inventory Report</h1>
               <p className="text-sm text-gray-600">Monitor stock levels, movements, and valuation</p>
             </div>
-            <Button>Export Report</Button>
+            <Button onClick={() => {
+              const headers = ['Product','Brand','SKU','Qty','Stock Value','Profit Margin %','Batches','Expiring'];
+              const rows = filteredInventory.map((item: any) => [
+                item.product,
+                item.brand || '',
+                item.sku || '',
+                item.totalQty,
+                item.stockValue,
+                item.profitMargin.toFixed(1),
+                item.batchCount,
+                item.expiringBatches,
+              ]);
+              exportToCSV(`inventory-report-${new Date().toISOString().slice(0,10)}`, headers, rows);
+            }}>Export Report</Button>
           </div>
 
           {/* Filters */}

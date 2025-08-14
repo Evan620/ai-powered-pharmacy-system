@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase';
 import { transformSupabaseRelationships } from '@/lib/supabase-transforms';
 import { useState } from 'react';
 import Link from 'next/link';
+import { exportToCSV } from '@/lib/csv';
 
 export default function ExpiryReportPage() {
   const [timeframe, setTimeframe] = useState('30'); // days
@@ -258,7 +259,22 @@ export default function ExpiryReportPage() {
               <h1 className="text-2xl font-semibold text-gray-900 mt-1">Expiry Report</h1>
               <p className="text-sm text-gray-600">Monitor products expiring and prevent losses</p>
             </div>
-            <Button>Export Report</Button>
+            <Button onClick={() => {
+              const headers = ['Product','Brand','SKU','Batch','Expiry','Days','Qty','Value at Risk','Status','Action'];
+              const rows = (filteredBatches || []).map((b: any) => [
+                b.product,
+                b.brand || '',
+                b.sku || '',
+                b.batchNo,
+                new Date(b.expiryDate).toLocaleDateString(),
+                b.daysUntilExpiry,
+                b.quantity,
+                b.batchValue,
+                b.status,
+                b.recommendation,
+              ]);
+              exportToCSV(`expiry-report-${new Date().toISOString().slice(0,10)}`, headers, rows);
+            }}>Export Report</Button>
           </div>
 
           {/* Filters */}

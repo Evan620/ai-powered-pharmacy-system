@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase';
 import { transformSupabaseRelationships } from '@/lib/supabase-transforms';
 import { useState } from 'react';
 import Link from 'next/link';
+import { exportToCSV } from '@/lib/csv';
 
 export default function FinancialReportPage() {
   const [period, setPeriod] = useState('30'); // days
@@ -271,7 +272,20 @@ export default function FinancialReportPage() {
               <h1 className="text-2xl font-semibold text-gray-900 mt-1">Financial Report</h1>
               <p className="text-sm text-gray-600">Analyze profitability, costs, and financial performance</p>
             </div>
-            <Button>Export Report</Button>
+            <Button onClick={() => {
+              const headers = ['Product','Brand','SKU','Revenue','COGS','Gross Profit','Margin %','Qty'];
+              const rows = (financialSummary?.productProfitability || []).map((p: any) => [
+                p.product,
+                p.brand || '',
+                p.sku || '',
+                p.revenue,
+                p.cogs,
+                p.grossProfit,
+                p.grossMargin.toFixed(1),
+                p.quantity,
+              ]);
+              exportToCSV(`financial-report-${new Date().toISOString().slice(0,10)}`, headers, rows);
+            }}>Export Report</Button>
           </div>
 
           {/* Filters */}
