@@ -10,6 +10,7 @@ import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { usePOSRealtime } from '@/hooks/usePOSRealtime';
 import {
   BatchLite,
   CartLine,
@@ -27,6 +28,10 @@ function formatKES(n: number) {
 
 export default function POSPage() {
   const router = useRouter();
+
+  // Set up realtime subscriptions for POS operations
+  usePOSRealtime();
+
   const [cart, setCart] = useState<CartLine[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 

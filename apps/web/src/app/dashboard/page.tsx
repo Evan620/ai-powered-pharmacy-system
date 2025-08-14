@@ -13,6 +13,8 @@ import { useInventoryStats, useLowStockProducts } from '@/hooks/useInventoryAler
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
+import { useRealtimeSubscriptions } from '@/hooks/useRealtimeSubscriptions';
+import { RealtimeStatus } from '@/components/debug/RealtimeStatus';
 import dynamic from 'next/dynamic';
 
 const MiniBarCard = dynamic(() => import('@/components/charts/MiniBarCard').then(m => m.MiniBarCard), { ssr: false });
@@ -73,6 +75,10 @@ function RevenueTodayCard() {
 
 export default function DashboardPage() {
   const { profile } = useAuth();
+
+  // Set up realtime subscriptions to automatically update dashboard data
+  useRealtimeSubscriptions();
+
   const { data: topSelling = [], isLoading: topSellingLoading } = useTopSellingProducts();
   const { data: expiringBatches = [], isLoading: expiringLoading } = useExpiringBatches(8); // Limit to 8 items
   const { data: inventoryStats, isLoading: statsLoading } = useInventoryStats();
@@ -93,6 +99,11 @@ export default function DashboardPage() {
             <div className="hidden sm:block h-14 w-40 rounded-md bg-gradient-to-r from-brand-100 to-white" />
           </div>
         </FadeIn>
+
+        {/* Realtime Debug Panel - Remove this in production */}
+        <div className="px-6">
+          <RealtimeStatus />
+        </div>
 
       {/* KPIs */}
       <div className="px-6 grid grid-cols-12 gap-6">
