@@ -9,10 +9,9 @@ const nextConfig = {
     formats: ['image/webp', 'image/avif'],
   },
   
-  // Experimental features
+  // Experimental features (appDir is now stable in Next.js 14)
   experimental: {
-    // Enable app directory (already using it)
-    appDir: true,
+    // Add any experimental features here if needed
   },
   
   // Environment variables that should be available on the client side

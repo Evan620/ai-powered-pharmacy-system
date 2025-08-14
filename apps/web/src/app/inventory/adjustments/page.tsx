@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSupabase } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 import { Card, CardHeader, CardBody } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -56,7 +57,7 @@ const ADJUSTMENT_REASONS = [
 ];
 
 export default function StockAdjustmentsPage() {
-  const { supabase } = useSupabase();
+  const { profile } = useAuth();
   const [batches, setBatches] = useState<Batch[]>([]);
   const [adjustments, setAdjustments] = useState<StockAdjustment[]>([]);
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>(null);

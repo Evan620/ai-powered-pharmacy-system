@@ -1,4 +1,13 @@
 {
+  "name": "ai-powered-pharmacy-system",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "cd apps/web && npm run build",
+    "dev": "cd apps/web && npm run dev",
+    "start": "cd apps/web && npm run start",
+    "install:web": "cd apps/web && npm install"
+  },
   "dependencies": {
     "@supabase/supabase-js": "^2.55.0",
     "dotenv": "^17.2.1"

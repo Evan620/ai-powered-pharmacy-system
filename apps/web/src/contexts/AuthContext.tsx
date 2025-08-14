@@ -11,7 +11,7 @@ interface AuthContextType {
   profile: Profile | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, metadata: { name: string; pharmacyName: string; role?: string }) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, metadata: { name: string; pharmacyName: string; role?: string }) => Promise<{ error: any; needsEmailConfirmation?: boolean; message?: string }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: any }>;
