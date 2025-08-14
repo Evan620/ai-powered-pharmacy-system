@@ -7,6 +7,7 @@ import { Table, Pagination } from '@/components/ui/Table';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
+import { transformSupabaseRelationships } from '@/lib/supabase-transforms';
 import { useState } from 'react';
 import Link from 'next/link';
 
@@ -47,6 +48,9 @@ export default function ExpiryReportPage() {
 
       if (error) throw error;
 
+      // Transform the data to handle array relationships
+      const transformedData = transformSupabaseRelationships(data || [], ['products']);
+
       const now = new Date();
       let expiredCount = 0;
       let expiredValue = 0;
@@ -54,7 +58,7 @@ export default function ExpiryReportPage() {
       let expiringValue = 0;
       let totalAtRisk = 0;
 
-      const processedData = data.map(batch => {
+      const processedData = transformedData.map((batch: any) => {
         const expiryDate = new Date(batch.expiry_date);
         const daysUntilExpiry = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
         const batchValue = batch.qty_available * (batch.products?.sell_price || 0);

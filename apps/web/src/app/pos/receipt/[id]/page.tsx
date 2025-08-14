@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
+import { transformSupabaseRelationships } from '@/lib/supabase-transforms';
 
 function formatKES(n: number) {
   return `KES ${Number(n || 0).toLocaleString()}`;
@@ -37,7 +38,15 @@ export default function ReceiptPage() {
         .eq('id', id)
         .single();
       if (error) throw error;
-      return sale;
+
+      // Transform the sale data to handle array relationships
+      const transformedSale = {
+        ...sale,
+        profiles: Array.isArray(sale.profiles) ? sale.profiles[0] : sale.profiles,
+        sale_items: transformSupabaseRelationships(sale.sale_items || [], ['products', 'batches'])
+      };
+
+      return transformedSale;
     },
   });
 

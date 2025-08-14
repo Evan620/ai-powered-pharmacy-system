@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
+import { transformSupabaseRelationships } from '@/lib/supabase-transforms';
 
 function formatKES(v: number) {
   return `KES ${Number(v || 0).toLocaleString()}`;
@@ -50,6 +51,14 @@ export default function BatchDetailPage() {
         .eq('id', id)
         .single();
       if (err1) throw err1;
+
+      // Transform the batch data to handle array relationships
+      const transformedBatch = {
+        ...batch,
+        products: Array.isArray(batch.products) ? batch.products[0] : batch.products,
+        suppliers: Array.isArray(batch.suppliers) ? batch.suppliers[0] : batch.suppliers
+      };
+
       // 2. Get sale items for this batch
       const { data: sale_items, error: err2 } = await supabase
         .from('sale_items')
@@ -59,7 +68,11 @@ export default function BatchDetailPage() {
         `)
         .eq('batch_id', id);
       if (err2) throw err2;
-      return { ...batch, sale_items };
+
+      // Transform sale items data
+      const transformedSaleItems = transformSupabaseRelationships(sale_items || [], ['sales']);
+
+      return { ...transformedBatch, sale_items: transformedSaleItems };
     }
   });
 

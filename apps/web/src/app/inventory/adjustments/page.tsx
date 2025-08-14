@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
+import { transformBatches, transformAdjustments } from '@/lib/supabase-transforms';
 import { Card, CardHeader, CardBody } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -95,12 +96,7 @@ export default function StockAdjustmentsPage() {
     if (error) {
       console.error('Error fetching batches:', error);
     } else {
-      // Transform the data to match our interface
-      const transformedData = (data || []).map((batch: any) => ({
-        ...batch,
-        products: Array.isArray(batch.products) ? batch.products[0] : batch.products
-      }));
-      setBatches(transformedData as Batch[]);
+      setBatches(transformBatches(data || []) as Batch[]);
     }
   };
 
@@ -130,16 +126,7 @@ export default function StockAdjustmentsPage() {
     if (error) {
       console.error('Error fetching adjustments:', error);
     } else {
-      // Transform the data to match our interface
-      const transformedData = (data || []).map((adjustment: any) => ({
-        ...adjustment,
-        performed_by: Array.isArray(adjustment.performed_by) ? adjustment.performed_by[0] : adjustment.performed_by,
-        batch: {
-          ...adjustment.batch,
-          product: Array.isArray(adjustment.batch?.product) ? adjustment.batch.product[0] : adjustment.batch?.product
-        }
-      }));
-      setAdjustments(transformedData as StockAdjustment[]);
+      setAdjustments(transformAdjustments(data || []) as StockAdjustment[]);
     }
   };
 
