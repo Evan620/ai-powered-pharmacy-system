@@ -72,6 +72,7 @@ export function useRealtimeSubscriptions() {
           queryClient.invalidateQueries({ queryKey: ['expiring-batches'] });
           queryClient.invalidateQueries({ queryKey: ['inventory-stats'] });
           queryClient.invalidateQueries({ queryKey: ['low-stock-products'] });
+          queryClient.invalidateQueries({ queryKey: ['low-stock-batches'] });
           queryClient.invalidateQueries({ queryKey: ['batch-detail'] });
         }
       )

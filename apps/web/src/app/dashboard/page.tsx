@@ -8,7 +8,7 @@ import { StatCardSkeleton } from '@/components/ui/LoadingSkeleton';
 import { FadeIn } from '@/components/ui/PageTransition';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { useTopSellingProducts } from '@/hooks/useProducts';
-import { useExpiringBatches } from '@/hooks/useBatches';
+import { useExpiringBatches, useLowStockBatches } from '@/hooks/useBatches';
 import { useInventoryStats, useLowStockProducts } from '@/hooks/useInventoryAlerts';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
@@ -80,6 +80,7 @@ export default function DashboardPage() {
 
   const { data: topSelling = [], isLoading: topSellingLoading } = useTopSellingProducts();
   const { data: expiringBatches = [], isLoading: expiringLoading } = useExpiringBatches(8); // Limit to 8 items
+  const { data: lowStockBatches = [], isLoading: lowStockBatchesLoading } = useLowStockBatches(10, 8);
   const { data: inventoryStats, isLoading: statsLoading } = useInventoryStats();
   const { data: lowStockProducts = [], isLoading: lowStockLoading } = useLowStockProducts();
 
@@ -167,7 +168,7 @@ export default function DashboardPage() {
             maxHeight="112px"
           />
           <MiniTable
-            title="Low Stock Alerts"
+            title="Low Stock Products"
             columns={[
               { key: 'product', header: 'Product', width: '2fr' },
               { key: 'sku', header: 'SKU', width: '1fr' },
@@ -177,13 +178,31 @@ export default function DashboardPage() {
               product: product.generic_name + (product.brand ? ` (${product.brand})` : ''),
               sku: product.sku,
               stock: `${product.total_stock || product.totalStock}`,
-              urgency: (product.total_stock || product.totalStock) === 0 ? 'critical' : 
+              urgency: (product.total_stock || product.totalStock) === 0 ? 'critical' :
                       (product.total_stock || product.totalStock) <= 10 ? 'warning' : 'normal'
             }))}
             isLoading={lowStockLoading}
             viewAllLink="/inventory/products"
-            maxHeight="300px"
+            maxHeight="140px"
             emptyMessage="All products are well stocked"
+          />
+          <MiniTable
+            title="Low Stock Batches"
+            columns={[
+              { key: 'product', header: 'Product', width: '2fr' },
+              { key: 'batch', header: 'Batch', width: '1fr' },
+              { key: 'stock', header: 'Stock', width: '80px', className: 'text-right' }
+            ]}
+            data={lowStockBatches.map(b => ({
+              product: b.product,
+              batch: b.batch,
+              stock: b.stock,
+              urgency: b.urgency as 'critical' | 'warning' | 'normal'
+            }))}
+            isLoading={lowStockBatchesLoading}
+            viewAllLink="/inventory/batches"
+            maxHeight="140px"
+            emptyMessage="No batches are below threshold"
           />
         </FadeIn>
       </div>
