@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google';
 import { QueryProvider } from '@/components/providers/QueryProvider';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ToastProvider } from '@/contexts/ToastContext';
+import { RealtimeProvider } from '@/components/providers/RealtimeProvider';
 import { LoadingBar } from '@/components/ui/LoadingBar';
 import { HydrationFix } from '@/components/ui/HydrationFix';
 
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AuthProvider>
           <QueryProvider>
             <ToastProvider>
+              <RealtimeProvider />
               {children}
             </ToastProvider>
           </QueryProvider>

@@ -4,6 +4,8 @@ import { supabase } from '@/lib/supabase';
 export function useProducts() {
   return useQuery({
     queryKey: ['products'],
+    refetchInterval: 30_000, // backup refresh every 30s in case realtime misses
+    refetchOnWindowFocus: 'always',
     queryFn: async () => {
       const { data, error } = await supabase
         .from('products')

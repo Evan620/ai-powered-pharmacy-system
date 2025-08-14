@@ -4,6 +4,8 @@ import { supabase } from '@/lib/supabase';
 export function useExpiringBatches(limit?: number) {
   return useQuery({
     queryKey: ['expiring-batches', limit],
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: 'always',
     queryFn: async () => {
       const thirtyDaysFromNow = new Date();
       thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
