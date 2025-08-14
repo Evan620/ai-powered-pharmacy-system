@@ -31,10 +31,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/inventory/batches/page.js"
     ],
-    "/_not-found/page": [
+    "/settings/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/_not-found/page.js"
+      "static/chunks/app/settings/page.js"
+    ],
+    "/inventory/products/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/inventory/products/page.js"
     ]
   }
 }

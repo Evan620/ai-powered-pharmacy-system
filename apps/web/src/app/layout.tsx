@@ -14,6 +14,7 @@ export const metadata: Metadata = {
   description: 'AI-powered pharmacy inventory & billing system',
   icons: {
     icon: '/favicon.svg',
+    apple: '/favicon.svg',
   },
 };
 
