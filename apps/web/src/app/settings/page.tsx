@@ -8,7 +8,8 @@ import { FadeIn } from '@/components/ui/PageTransition';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToastContext } from '@/contexts/ToastContext';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useSettings, useUpsertSetting } from '@/hooks/useSettings';
 
 export default function SettingsPage() {
   const { profile } = useAuth();
@@ -22,8 +23,24 @@ export default function SettingsPage() {
     { id: 'security', label: 'Security', icon: '🔒' },
   ];
 
-  const handleSave = () => {
-    toast.success('Settings saved successfully!');
+  const { data: settings } = useSettings();
+  const upsert = useUpsertSetting();
+
+  const currency = settings?.currency || 'KES';
+  const lowProduct = settings?.low_stock_product_threshold || '10';
+  const lowBatch = settings?.low_stock_batch_threshold || '10';
+
+  const handleSave = async () => {
+    try {
+      await Promise.all([
+        upsert.mutateAsync({ key: 'currency', value: currency }),
+        upsert.mutateAsync({ key: 'low_stock_product_threshold', value: lowProduct }),
+        upsert.mutateAsync({ key: 'low_stock_batch_threshold', value: lowBatch }),
+      ]);
+      toast.success('Settings saved successfully!');
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to save settings');
+    }
   };
 
   return (
@@ -85,7 +102,8 @@ export default function SettingsPage() {
                         />
                         <Select
                           label="Currency"
-                          value="KES"
+                          value={settings?.currency || 'KES'}
+                          onChange={(e) => upsert.mutate({ key: 'currency', value: e.target.value })}
                           options={[
                             { label: 'Kenyan Shilling (KES)', value: 'KES' },
                             { label: 'US Dollar (USD)', value: 'USD' },

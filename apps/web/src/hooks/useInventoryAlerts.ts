@@ -53,9 +53,17 @@ export function useInventoryStats() {
         `)
         .eq('active', true);
 
+      // threshold from settings (fallback to 10)
+      const { data: settings } = await supabase
+        .from('settings')
+        .select('key,value')
+        .in('key', ['low_stock_product_threshold'])
+        .maybeSingle();
+      const threshold = Number(settings?.value || 10);
+
       const lowStockCount = products?.filter(product => {
         const totalStock = product.batches.reduce((sum, batch) => sum + batch.qty_available, 0);
-        return totalStock <= 50;
+        return totalStock <= threshold;
       }).length || 0;
 
       return {

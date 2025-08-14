@@ -48,12 +48,23 @@ export function useExpiringBatches(limit?: number) {
   });
 }
 
-export function useLowStockBatches(threshold: number = 10, limit?: number) {
+export function useLowStockBatches(threshold?: number, limit?: number) {
   return useQuery({
     queryKey: ['low-stock-batches', threshold, limit],
     refetchInterval: 30_000,
     refetchOnWindowFocus: 'always',
     queryFn: async () => {
+      // fetch threshold from settings if not provided
+      let effectiveThreshold = threshold;
+      if (effectiveThreshold === undefined) {
+        const { data: s } = await supabase
+          .from('settings')
+          .select('value')
+          .eq('key', 'low_stock_batch_threshold')
+          .maybeSingle();
+        effectiveThreshold = Number(s?.value || 10);
+      }
+
       let query = supabase
         .from('batches')
         .select(`
@@ -63,7 +74,7 @@ export function useLowStockBatches(threshold: number = 10, limit?: number) {
           expiry_date,
           products (generic_name, brand, sku)
         `)
-        .lte('qty_available', threshold)
+        .lte('qty_available', effectiveThreshold as number)
         .gt('qty_available', -1) // guard
         .order('qty_available', { ascending: true });
 
@@ -77,7 +88,7 @@ export function useLowStockBatches(threshold: number = 10, limit?: number) {
         sku: b.products?.sku,
         batch: b.batch_no,
         stock: b.qty_available,
-        urgency: b.qty_available === 0 ? 'critical' : b.qty_available <= threshold ? 'warning' : 'normal',
+        urgency: b.qty_available === 0 ? 'critical' : b.qty_available <= (effectiveThreshold as number) ? 'warning' : 'normal',
         expiry: b.expiry_date,
       }));
     },
