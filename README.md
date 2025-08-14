@@ -215,3 +215,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **Made with ❤️ for pharmacies worldwide**
+
+<!-- Deployment trigger -->
