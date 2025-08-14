@@ -20,6 +20,7 @@ import {
 } from '@/lib/pos';
 import { PaymentModal } from '@/components/pos/PaymentModal';
 import { HoldDrawer, HeldCart } from '@/components/pos/HoldDrawer';
+import { usePOSOutbox } from '@/hooks/usePOSOutbox';
 import { nanoid } from 'nanoid';
 
 function formatKES(n: number) {
@@ -41,6 +42,7 @@ export default function POSPage() {
 
   // Payment modal state
   const [payOpen, setPayOpen] = useState(false);
+  const { enqueue, trySync, items: outboxItems } = usePOSOutbox();
   const [payLoading, setPayLoading] = useState(false);
   const [payError, setPayError] = useState('');
 
@@ -443,13 +445,25 @@ export default function POSPage() {
                 })),
               })),
             };
-            const { data, error } = await supabase.rpc('create_pos_sale', { payload });
-            if (error || !data) throw error || new Error('Unexpected error');
-            // Go to receipt page (uses sale_id)
-            setPayOpen(false);
-            setTimeout(() => {
-              router.push("/pos/receipt/" + data.sale_id);
-            }, 300);
+            try {
+              const { data, error } = await supabase.rpc('create_pos_sale', { payload });
+              if (error || !data) throw error || new Error('Unexpected error');
+              // Success: navigate to receipt
+              setPayOpen(false);
+              setTimeout(() => {
+                router.push("/pos/receipt/" + data.sale_id);
+              }, 300);
+            } catch (networkOrRlsError: any) {
+              // Queue offline for retry
+              enqueue({ id: nanoid(), payload, created_at: new Date().toISOString(), attempts: 0, last_error: networkOrRlsError?.message });
+              setPayOpen(false);
+              setTimeout(() => {
+                // Try syncing in the background
+                trySync();
+                // Stay on POS but show toast via payError banner briefly
+              }, 100);
+              setPayError('Sale queued to outbox. Will sync when online.');
+            }
           } catch (err: any) {
             setPayError(err?.message || 'Failed to charge. Please try again.');
           } finally {
