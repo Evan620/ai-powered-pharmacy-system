@@ -9,7 +9,12 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "build:analyze": "ANALYZE=true next build"
+    "build:analyze": "ANALYZE=true next build",
+    "build:clean": "rm -rf .next && npm run build",
+    "test:prod": "npm run build && npm run start",
+    "test:types": "tsc --noEmit",
+    "test:build": "npm run type-check && npm run lint && npm run build",
+    "deploy:test": "npm run build:clean && npm run start"
   },
   "dependencies": {
     "@heroicons/react": "^2.1.5",

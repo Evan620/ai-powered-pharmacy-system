@@ -16,7 +16,7 @@ interface Batch {
   batch_no: string;
   qty_available: number;
   expiry_date: string;
-  product: {
+  products: {
     id: string;
     sku: string;
     generic_name: string;
@@ -80,7 +80,7 @@ export default function StockAdjustmentsPage() {
         batch_no,
         qty_available,
         expiry_date,
-        product:products (
+        products (
           id,
           sku,
           generic_name,
@@ -95,7 +95,12 @@ export default function StockAdjustmentsPage() {
     if (error) {
       console.error('Error fetching batches:', error);
     } else {
-      setBatches(data || []);
+      // Transform the data to match our interface
+      const transformedData = (data || []).map((batch: any) => ({
+        ...batch,
+        products: Array.isArray(batch.products) ? batch.products[0] : batch.products
+      }));
+      setBatches(transformedData as Batch[]);
     }
   };
 
@@ -125,7 +130,16 @@ export default function StockAdjustmentsPage() {
     if (error) {
       console.error('Error fetching adjustments:', error);
     } else {
-      setAdjustments(data || []);
+      // Transform the data to match our interface
+      const transformedData = (data || []).map((adjustment: any) => ({
+        ...adjustment,
+        performed_by: Array.isArray(adjustment.performed_by) ? adjustment.performed_by[0] : adjustment.performed_by,
+        batch: {
+          ...adjustment.batch,
+          product: Array.isArray(adjustment.batch?.product) ? adjustment.batch.product[0] : adjustment.batch?.product
+        }
+      }));
+      setAdjustments(transformedData as StockAdjustment[]);
     }
   };
 
@@ -172,8 +186,8 @@ export default function StockAdjustmentsPage() {
   };
 
   const filteredBatches = batches.filter(batch =>
-    batch.product.generic_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    batch.product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    batch.products.generic_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    batch.products.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
     batch.batch_no.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -224,16 +238,16 @@ export default function StockAdjustmentsPage() {
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className="font-medium text-sm">{batch.product.generic_name}</p>
+                        <p className="font-medium text-sm">{batch.products.generic_name}</p>
                         <p className="text-xs text-slate-600">
-                          SKU: {batch.product.sku} | Batch: {batch.batch_no}
+                          SKU: {batch.products.sku} | Batch: {batch.batch_no}
                         </p>
                         <p className="text-xs text-slate-500">
                           Expires: {new Date(batch.expiry_date).toLocaleDateString()}
                         </p>
                       </div>
                       <Badge variant="secondary">
-                        {batch.qty_available} {batch.product.unit}
+                        {batch.qty_available} {batch.products.unit}
                       </Badge>
                     </div>
                   </div>
@@ -244,12 +258,12 @@ export default function StockAdjustmentsPage() {
             {selectedBatch && (
               <>
                 <div className="p-3 bg-blue-50 rounded-lg">
-                  <p className="font-medium text-sm">{selectedBatch.product.generic_name}</p>
+                  <p className="font-medium text-sm">{selectedBatch.products.generic_name}</p>
                   <p className="text-xs text-slate-600">
-                    SKU: {selectedBatch.product.sku} | Batch: {selectedBatch.batch_no}
+                    SKU: {selectedBatch.products.sku} | Batch: {selectedBatch.batch_no}
                   </p>
                   <p className="text-sm text-blue-700 mt-1">
-                    Current Quantity: {selectedBatch.qty_available} {selectedBatch.product.unit}
+                    Current Quantity: {selectedBatch.qty_available} {selectedBatch.products.unit}
                   </p>
                 </div>
 
@@ -267,7 +281,7 @@ export default function StockAdjustmentsPage() {
                   {newQty && (
                     <p className="text-xs text-slate-600 mt-1">
                       Change: {parseInt(newQty) - selectedBatch.qty_available > 0 ? '+' : ''}
-                      {parseInt(newQty) - selectedBatch.qty_available} {selectedBatch.product.unit}
+                      {parseInt(newQty) - selectedBatch.qty_available} {selectedBatch.products.unit}
                     </p>
                   )}
                 </div>
