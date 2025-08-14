@@ -164,7 +164,7 @@ export function useTableSubscription(
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const channel = supabase
+    const channel = (supabase as any)
       .channel(`${tableName}-subscription`)
       .on(
         'postgres_changes',

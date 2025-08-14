@@ -125,9 +125,8 @@ export function getRealtimeInfo() {
   console.log('Active realtime channels:', channels.length);
   channels.forEach((channel, index) => {
     console.log(`Channel ${index + 1}:`, {
-      topic: channel.topic,
-      state: channel.state,
-      joinedAt: channel.joinedAt
+      topic: (channel as any).topic,
+      state: (channel as any).state,
     });
   });
   return channels;
