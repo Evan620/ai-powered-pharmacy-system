@@ -44,8 +44,17 @@ export default function InventoryReportPage() {
 
       if (productsError) throw productsError;
 
-      // Transform the data to handle array relationships
-      const transformedProducts = transformSupabaseRelationships(products || [], ['batches']);
+      // Keep batches as arrays (no transform to single object)
+      const transformedProducts = (products || []);
+
+      // Low stock threshold (from settings, fallback 10)
+      const { data: settingsRow } = await supabase
+        .from('settings')
+        .select('value')
+        .eq('key', 'low_stock_product_threshold')
+        .maybeSingle();
+      const threshold = Number(settingsRow?.value || 10);
+
 
       let totalProducts = 0;
       let totalValue = 0;
@@ -55,10 +64,10 @@ export default function InventoryReportPage() {
 
       const inventoryData = transformedProducts.map((product: any) => {
         const totalQty = product.batches.reduce((sum, batch) => sum + batch.qty_available, 0);
-        const avgCostPrice = product.batches.length > 0 
-          ? product.batches.reduce((sum, batch) => sum + batch.cost_price, 0) / product.batches.length 
+        const avgCostPrice = product.batches.length > 0
+          ? product.batches.reduce((sum, batch) => sum + batch.cost_price, 0) / product.batches.length
           : 0;
-        
+
         const stockValue = totalQty * product.sell_price;
         const costValue = totalQty * avgCostPrice;
 
@@ -67,12 +76,12 @@ export default function InventoryReportPage() {
         totalCostValue += costValue;
 
         if (totalQty === 0) outOfStockCount++;
-        else if (totalQty <= 50) lowStockCount++; // Low stock threshold
+        else if (totalQty <= threshold) lowStockCount++; // Low stock threshold (settings)
 
         // Check for expiring batches (next 30 days)
         const thirtyDaysFromNow = new Date();
         thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
-        const expiringBatches = product.batches.filter(batch => 
+        const expiringBatches = product.batches.filter(batch =>
           new Date(batch.expiry_date) <= thirtyDaysFromNow && batch.qty_available > 0
         );
 
@@ -89,7 +98,7 @@ export default function InventoryReportPage() {
           profitMargin: avgCostPrice > 0 ? ((product.sell_price - avgCostPrice) / product.sell_price * 100) : 0,
           batchCount: product.batches.length,
           expiringBatches: expiringBatches.length,
-          status: totalQty === 0 ? 'out-of-stock' : totalQty <= 50 ? 'low-stock' : 'in-stock'
+          status: totalQty === 0 ? 'out-of-stock' : totalQty <= threshold ? 'low-stock' : 'in-stock'
         };
       });
 
