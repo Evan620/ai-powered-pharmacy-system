@@ -21,6 +21,7 @@ import {
 import { PaymentModal } from '@/components/pos/PaymentModal';
 import { HoldDrawer, HeldCart } from '@/components/pos/HoldDrawer';
 import { usePOSOutbox } from '@/hooks/usePOSOutbox';
+import { OutboxDrawer } from '@/components/pos/OutboxDrawer';
 import { nanoid } from 'nanoid';
 
 function formatKES(n: number) {
@@ -42,7 +43,8 @@ export default function POSPage() {
 
   // Payment modal state
   const [payOpen, setPayOpen] = useState(false);
-  const { enqueue, trySync, items: outboxItems } = usePOSOutbox();
+  const { enqueue, trySync, items: outboxItems, remove: removeOutbox } = usePOSOutbox();
+  const [outboxOpen, setOutboxOpen] = useState(false);
   const [payLoading, setPayLoading] = useState(false);
   const [payError, setPayError] = useState('');
 
@@ -386,10 +388,10 @@ export default function POSPage() {
                   <Button
                     variant="secondary"
                     className="h-16 flex flex-col items-center justify-center hover:bg-gray-100 transition-colors"
-                    disabled
+                    onClick={() => setOutboxOpen(true)}
                   >
-                    <span className="text-lg mb-1">🧾</span>
-                    <span className="text-xs">Receipt</span>
+                    <span className="text-lg mb-1">📤</span>
+                    <span className="text-xs">Outbox ({outboxItems.length})</span>
                   </Button>
                 </div>
               </CardBody>
@@ -421,6 +423,13 @@ export default function POSPage() {
       onResume={handleResume}
       onDelete={handleDelete}
       />
+      <OutboxDrawer
+        open={outboxOpen}
+        items={outboxItems.map(i => ({ id: i.id, created_at: i.created_at, attempts: i.attempts, last_error: i.last_error }))}
+        onRetry={(id) => { trySync(); }}
+        onDelete={(id) => removeOutbox(id)}
+        onClose={() => setOutboxOpen(false)}
+      />
       <PaymentModal
         open={payOpen}
         onClose={() => { setPayOpen(false); setPayError(''); }}
@@ -446,7 +455,7 @@ export default function POSPage() {
               })),
             };
             try {
-              const { data, error } = await supabase.rpc('create_pos_sale', { payload });
+              const { data, error } = await supabase.rpc('create_pos_sale', { payload: { ...payload, idempotency_key: payload.lines.map((l:any)=>l.product_id).join('-') + '-' + Date.now() } });
               if (error || !data) throw error || new Error('Unexpected error');
               // Success: navigate to receipt
               setPayOpen(false);
