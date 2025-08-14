@@ -8,6 +8,7 @@ import { Table, Pagination } from '@/components/ui/Table';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
+import { transformSupabaseRelationships } from '@/lib/supabase-transforms';
 import { useState } from 'react';
 import Link from 'next/link';
 
@@ -76,8 +77,11 @@ export default function SalesReportPage() {
 
       if (error) throw error;
 
+      // Transform the data to handle array relationships
+      const transformedData = transformSupabaseRelationships(data || [], ['products', 'sales']);
+
       // Group by product
-      const productSales = data.reduce((acc, item) => {
+      const productSales = transformedData.reduce((acc: any, item: any) => {
         const productKey = item.products?.sku || 'unknown';
         if (!acc[productKey]) {
           acc[productKey] = {

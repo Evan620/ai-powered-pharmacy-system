@@ -7,6 +7,7 @@ import { Table, Pagination } from '@/components/ui/Table';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
+import { transformSupabaseRelationships } from '@/lib/supabase-transforms';
 import { useState } from 'react';
 import Link from 'next/link';
 
@@ -54,13 +55,16 @@ export default function FinancialReportPage() {
 
       if (salesError) throw salesError;
 
+      // Transform the data to handle array relationships
+      const transformedSalesData = transformSupabaseRelationships(salesData || [], ['products', 'batches', 'sales']);
+
       let totalRevenue = 0;
       let totalCOGS = 0;
       let totalDiscount = 0;
       const productProfitability: Record<string, any> = {};
       const categoryPerformance: Record<string, any> = {};
 
-      salesData.forEach(item => {
+      transformedSalesData.forEach((item: any) => {
         const revenue = item.qty * item.unit_price;
         const discount = item.discount || 0;
         const netRevenue = revenue - discount;

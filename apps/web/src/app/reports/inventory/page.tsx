@@ -7,6 +7,7 @@ import { Table, Pagination } from '@/components/ui/Table';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
+import { transformSupabaseRelationships } from '@/lib/supabase-transforms';
 import { useState } from 'react';
 import Link from 'next/link';
 
@@ -41,13 +42,16 @@ export default function InventoryReportPage() {
 
       if (productsError) throw productsError;
 
+      // Transform the data to handle array relationships
+      const transformedProducts = transformSupabaseRelationships(products || [], ['batches']);
+
       let totalProducts = 0;
       let totalValue = 0;
       let totalCostValue = 0;
       let lowStockCount = 0;
       let outOfStockCount = 0;
 
-      const inventoryData = products.map(product => {
+      const inventoryData = transformedProducts.map((product: any) => {
         const totalQty = product.batches.reduce((sum, batch) => sum + batch.qty_available, 0);
         const avgCostPrice = product.batches.length > 0 
           ? product.batches.reduce((sum, batch) => sum + batch.cost_price, 0) / product.batches.length 
@@ -117,7 +121,10 @@ export default function InventoryReportPage() {
 
       if (error) throw error;
 
-      return data.map(item => ({
+      // Transform the data to handle array relationships
+      const transformedMovements = transformSupabaseRelationships(data || [], ['products', 'sales']);
+
+      return transformedMovements.map((item: any) => ({
         date: new Date(item.sales?.date || item.created_at).toLocaleDateString(),
         product: item.products?.generic_name || 'Unknown',
         sku: item.products?.sku || 'N/A',
