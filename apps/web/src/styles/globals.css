@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .animate-in {
+    animation-duration: 0.3s;
+    animation-fill-mode: both;
+  }
+
+  .fade-in {
+    animation-name: fadeIn;
+  }
+
+  .slide-in-from-bottom-2 {
+    animation-name: slideInFromBottom2;
+  }
+
+  .slide-in-from-right-full {
+    animation-name: slideInFromRightFull;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Safari and Chrome */
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromBottom2 {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromRightFull {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+:root {
+  /* focus ring */
+  --ring: #9DB2FF;
+}
+
+/* Base typography and background */
+@layer base {
+  html { scroll-behavior: smooth; }
+  body {
+    @apply bg-gray-50 text-slate-900 antialiased;
+    background:
+      radial-gradient(1000px circle at 0% 0%, rgba(151, 99, 255, 0.35), transparent 60%),
+      radial-gradient(900px circle at 100% 100%, rgba(193, 66, 255, 0.30), transparent 55%),
+      linear-gradient(180deg, #FBF7FF 0%, #F4F6FF 100%);
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+/* Card primitive */
+@layer components {
+  .card {
+    @apply rounded-card border border-gray-200 shadow-card bg-gradient-to-b from-[#FAFBFF] to-white;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-md bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 font-medium shadow-sm transition;
+    background-image: linear-gradient(180deg, #4F6DFF 0%, #3B5BFE 100%);
+  }
+}
+
