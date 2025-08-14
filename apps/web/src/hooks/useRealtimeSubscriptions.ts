@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 
@@ -8,8 +8,11 @@ import { supabase } from '@/lib/supabase';
  */
 export function useRealtimeSubscriptions() {
   const queryClient = useQueryClient();
+  const didSetup = useRef(false);
 
   useEffect(() => {
+    if (didSetup.current) return;
+    didSetup.current = true;
     // Sales table subscription
     const salesChannel = supabase
       .channel('sales-changes')
@@ -26,7 +29,7 @@ export function useRealtimeSubscriptions() {
           queryClient.invalidateQueries({ queryKey: ['revenue-today-trend'] });
           queryClient.invalidateQueries({ queryKey: ['sales-bar'] });
           queryClient.invalidateQueries({ queryKey: ['sales-trend'] });
-          queryClient.invalidateQueries({ queryKey: ['top-selling'] });
+          queryClient.invalidateQueries({ queryKey: ['top-selling-products'] });
           queryClient.invalidateQueries({ queryKey: ['sales-summary'] });
         }
       )
@@ -45,7 +48,7 @@ export function useRealtimeSubscriptions() {
         (payload) => {
           console.log('Sale items change detected:', payload);
           // Invalidate queries that depend on sale items
-          queryClient.invalidateQueries({ queryKey: ['top-selling'] });
+          queryClient.invalidateQueries({ queryKey: ['top-selling-products'] });
           queryClient.invalidateQueries({ queryKey: ['revenue-today-trend'] });
           queryClient.invalidateQueries({ queryKey: ['sales-bar'] });
           queryClient.invalidateQueries({ queryKey: ['inventory-stats'] });
@@ -68,7 +71,7 @@ export function useRealtimeSubscriptions() {
           // Invalidate batch and inventory related queries
           queryClient.invalidateQueries({ queryKey: ['expiring-batches'] });
           queryClient.invalidateQueries({ queryKey: ['inventory-stats'] });
-          queryClient.invalidateQueries({ queryKey: ['low-stock'] });
+          queryClient.invalidateQueries({ queryKey: ['low-stock-products'] });
           queryClient.invalidateQueries({ queryKey: ['batch-detail'] });
         }
       )
@@ -88,7 +91,7 @@ export function useRealtimeSubscriptions() {
           console.log('Products change detected:', payload);
           // Invalidate product-related queries
           queryClient.invalidateQueries({ queryKey: ['products'] });
-          queryClient.invalidateQueries({ queryKey: ['low-stock'] });
+          queryClient.invalidateQueries({ queryKey: ['low-stock-products'] });
           queryClient.invalidateQueries({ queryKey: ['inventory-stats'] });
         }
       )

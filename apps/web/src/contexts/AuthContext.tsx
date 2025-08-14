@@ -37,6 +37,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
+    // Safety net: ensure we never stay stuck in loading forever (e.g., network hiccups)
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 8000);
+
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
@@ -61,7 +66,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(timeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const loadProfile = async (userId: string) => {
@@ -93,7 +101,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const createMissingProfile = async (userId: string) => {
     try {
       // First, try to call our secure function to create pharmacy and profile
-      const { data: functionResult, error: functionError } = await supabase.rpc(
+      await supabase.rpc(
         'setup_user_profile',
         {
           pharmacy_name: 'Default Pharmacy'
@@ -135,7 +143,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .limit(1)
         .single();
       
-      let pharmacyId;
+      let pharmacyId: string;
       if (pharmacyError || !pharmacy) {
         // Create a default pharmacy
         const { data: newPharmacy, error: createPharmacyError } = await supabase
