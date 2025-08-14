@@ -114,6 +114,7 @@ export function useRealtimeSubscriptions() {
           queryClient.invalidateQueries({ queryKey: ['stock-adjustments'] });
           queryClient.invalidateQueries({ queryKey: ['inventory-stats'] });
           queryClient.invalidateQueries({ queryKey: ['batches'] });
+          queryClient.invalidateQueries({ queryKey: ['stock-movements'] });
         }
       )
       .subscribe();
@@ -134,6 +135,7 @@ export function useRealtimeSubscriptions() {
           queryClient.invalidateQueries({ queryKey: ['revenue-today-trend'] });
           queryClient.invalidateQueries({ queryKey: ['sales-bar'] });
           queryClient.invalidateQueries({ queryKey: ['sales-trend'] });
+          queryClient.invalidateQueries({ queryKey: ['stock-movements'] });
         }
       )
       .subscribe();
