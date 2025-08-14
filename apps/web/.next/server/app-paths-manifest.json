@@ -1,7 +1,0 @@
-{
-  "/settings/page": "app/settings/page.js",
-  "/inventory/products/page": "app/inventory/products/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/inventory/batches/page": "app/inventory/batches/page.js",
-  "/pos/page": "app/pos/page.js"
-}

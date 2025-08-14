@@ -42,8 +42,8 @@ BEGIN
         sale_id, product_id, batch_id, qty, unit_price, discount
       ) VALUES (
         sale_id,
-        pline->>'product_id',
-        p_batch->>'batch_id',
+        (pline->>'product_id')::uuid,
+        (p_batch->>'batch_id')::uuid,
         (p_batch->>'qty')::int,
         (pline->>'unit_price')::numeric,
         COALESCE((pline->>'discount')::numeric, 0)
@@ -52,7 +52,7 @@ BEGIN
       -- Decrement batch stock atomically
       UPDATE batches
       SET qty_available = qty_available - (p_batch->>'qty')::int
-      WHERE id = p_batch->>'batch_id' AND qty_available >= (p_batch->>'qty')::int;
+      WHERE id = (p_batch->>'batch_id')::uuid AND qty_available >= (p_batch->>'qty')::int;
       IF NOT FOUND THEN
         RAISE EXCEPTION 'Insufficient stock or invalid batch for batch_id: %', p_batch->>'batch_id';
       END IF;

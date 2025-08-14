@@ -44,7 +44,7 @@ export default function CreateAccountPage() {
     if (result.error) {
       setError(result.error.message);
       toast.error('Failed to create account. Please try again.');
-    } else if (result.needsEmailConfirmation) {
+    } else if ('needsEmailConfirmation' in result) {
       toast.success('Account created! Please check your email to confirm your account.');
       setError(''); // Clear any previous errors
       // Show success message instead of redirecting
