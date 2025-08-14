@@ -9,10 +9,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { useToastContext } from '@/contexts/ToastContext';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 
-export default function NewBatchPage() {
+function NewBatchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
@@ -262,5 +262,13 @@ export default function NewBatchPage() {
         </div>
       </AppShell>
     </ProtectedRoute>
+  );
+}
+
+export default function NewBatchPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <NewBatchContent />
+    </Suspense>
   );
 }
