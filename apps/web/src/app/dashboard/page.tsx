@@ -63,11 +63,10 @@ function RevenueTodayCard() {
   return isLoading ? (
     <StatCardSkeleton />
   ) : (
-    <StatCard 
-      label="Revenue Today" 
-      value={`KES ${data?.todayTotal?.toLocaleString() || '0'}`} 
+    <StatCard
+      label="Revenue Today"
+      value={`KES ${data?.todayTotal?.toLocaleString() || '0'}`}
       trend={data?.trend || ''}
-      trendColor={data?.pct > 0 ? 'green' : data?.pct < 0 ? 'red' : undefined}
     />
   );
 }
