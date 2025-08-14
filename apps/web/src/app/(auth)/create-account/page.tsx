@@ -70,11 +70,9 @@ export default function CreateAccountPage() {
   }
 
   return (
-    <main className="min-h-screen">
-      <div className="mx-auto max-w-lg p-6">
-        <div className="rounded-frame shadow-frame bg-white p-2">
-          <div className="min-h-[82vh] p-4 md:p-8 flex items-center justify-center">
-            <Card className="w-full overflow-hidden">
+    <main className="min-h-screen flex items-center justify-center p-6">
+      <div className="w-full max-w-lg">
+        <Card className="w-full overflow-hidden">
               <div className="bg-gradient-to-b from-brand-50 to-white px-6 py-8 text-center">
                 <div className="mx-auto h-12 w-12 rounded-full bg-gradient-to-b from-brand-500 to-brand-700 grid place-content-center text-white shadow">
                   <span className="text-xl">🏥</span>
@@ -139,9 +137,7 @@ export default function CreateAccountPage() {
                   <Link href="/sign-in" className="underline underline-offset-4">Sign in</Link>
                 </p>
               </CardBody>
-            </Card>
-          </div>
-        </div>
+        </Card>
       </div>
     </main>
   );

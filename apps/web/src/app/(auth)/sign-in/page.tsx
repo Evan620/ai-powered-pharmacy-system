@@ -60,11 +60,9 @@ export default function SignInPage() {
   }
 
   return (
-    <main className="min-h-screen">
-      <div className="mx-auto max-w-lg p-6">
-        <div className="rounded-frame shadow-frame bg-white p-2">
-          <div className="min-h-[82vh] p-4 md:p-8 flex items-center justify-center">
-            <FadeIn>
+    <main className="min-h-screen flex items-center justify-center p-6">
+      <div className="w-full max-w-lg">
+        <FadeIn>
               <Card className="w-full overflow-hidden shadow-lg">
                 {/* Top gradient header with emblem */}
                 <div className="bg-gradient-to-b from-brand-50 to-white px-6 py-8 text-center">
@@ -126,9 +124,7 @@ export default function SignInPage() {
             </Card>
             </FadeIn>
           </div>
-        </div>
-      </div>
-    </main>
+        </main>
   );
 }
 
