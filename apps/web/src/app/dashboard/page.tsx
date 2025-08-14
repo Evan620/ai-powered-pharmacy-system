@@ -146,7 +146,7 @@ export default function DashboardPage() {
               product: batch.label.split(' (Batch')[0],
               batch: batch.label.match(/Batch ([^)]+)/)?.[1] || 'N/A',
               days: batch.value,
-              urgency: batch.urgency
+              urgency: batch.urgency as 'expired' | 'critical' | 'warning' | 'normal'
             }))}
             isLoading={expiringLoading}
             viewAllLink="/inventory/batches"
