@@ -21,7 +21,7 @@ export default function InventoryReportPage() {
   const MOV_PER_PAGE = 10;
 
   // Inventory Summary Query
-  const { data: inventorySummary, isLoading: summaryLoading } = useQuery({
+  const { data: inventorySummary, isLoading: summaryLoading, error: summaryError } = useQuery({
     queryKey: ['inventory-summary'],
     queryFn: async () => {
       const { data: products, error: productsError } = await supabase
@@ -39,7 +39,8 @@ export default function InventoryReportPage() {
             expiry_date
           )
         `)
-        .eq('active', true);
+        .eq('active', true)
+        .eq('pharmacy_id', (await supabase.rpc('current_user_pharmacy_id')).data);
 
       if (productsError) throw productsError;
 
@@ -290,6 +291,14 @@ export default function InventoryReportPage() {
               </div>
             </CardBody>
           </Card>
+
+          {/* Error State */}
+          {summaryError && (
+            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+              <h3 className="text-red-800 font-medium">Failed to load inventory data</h3>
+              <p className="text-red-600 text-sm mt-1">{summaryError.message}</p>
+            </div>
+          )}
 
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
